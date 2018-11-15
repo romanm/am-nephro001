@@ -1,0 +1,33 @@
+<div>
+	{{oo.tableRoot.value}}
+	<div ng-repeat="c in oo.tableRoot.docRoot.children"
+		data-ng-switch="$index">
+		<div data-ng-switch-default>
+			<div style="text-transform: uppercase;" class="am-b w3-center">{{c.value}}</div>
+		</div>
+		<div data-ng-switch-when="4">
+			<div style="text-transform: uppercase;" class="am-b w3-center">{{c.value}}</div>
+			<div ng-repeat="c1 in c.children" data-ng-switch="$index">
+				<div class="am-b w3-center">{{c1.value}}</div>
+				<div ng-repeat="c2 in c1.children" data-ng-switch="$index"
+					ng-init="el=c2">
+					<span data-ng-if="el.reference">
+						{{datadictionary.elementsMap[el.reference].value}} <span
+						data-ng-include="'/f/am-dev/1c-db-tables2/doc_17_dd_el_values.html'"
+						data-ng-repeat="dd_el in [datadictionary.elementsMap[el.reference]]"></span>
+					</span>
+				</div>
+			</div>
+		</div>
+		<div data-ng-switch-when="0">
+			<span style="text-transform: uppercase;" class="am-b">{{c.value}}</span>
+		</div>
+		<div data-ng-switch-when="1" class="am-b">
+			{{c.value}}
+			<div class="w3-container">
+				<div ng-repeat="c1 in c.children" data-ng-switch="$index">
+					{{c1.value}}</div>
+			</div>
+		</div>
+	</div>
+</div>
