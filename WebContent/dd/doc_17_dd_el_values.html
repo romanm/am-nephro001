@@ -1,0 +1,5 @@
+<span class="w3-hover-shadow" data-ng-repeat="c2 in dd_el.children">{{!c2.value?
+	('el_'+c2.doc_id):''}}{{c2.value}}<span
+	data-ng-repeat="c3 in c2.children">{{$first?' (':''}}<span
+		class="w3-hover-shadow">{{c3.value}}</span>{{$last?')':', '}}
+</span>{{$last?'.':', '}}</span>
