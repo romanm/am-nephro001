@@ -1,11 +1,26 @@
-<table>
-	<tr class="w3-tiny w3-blue-gray">
-		<th data-ng-repeat="(ck,cv) in create_tables.col_keys">{{cv}}</th>
-	</tr>
-	<tr data-ng-repeat="tr in oo.children">
-		<td data-ng-repeat="(ck,cv) in create_tables.col_keys">
-		{{tr[ck]}}
-		</td>
-	</tr>
-</table>
+<div class="w3-row">
+	<div class="w3-half">
+		<div class="w3-tiny">table: {{oo.doc_id}}</div>
+		<table class="w3-card">
+			<tr class="w3-tiny w3-blue-gray">
+				<th data-ng-repeat="(ck,cv) in create_tables.col_keys">{{cv}}</th>
+			</tr>
+			<tr data-ng-repeat="tr in oo.children">
+				<td data-ng-repeat="(ck,cv) in create_tables.col_keys">
+					{{tr[ck]}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="w3-half">
+		<div data-ng-repeat="tb in oo.children"
+			data-ng-if="[27,37].indexOf(tb.doctype)>=0">
+			{{tb.value}}
+			<div data-ng-repeat="oo in [tb]" class=""
+				data-ng-include="'/r/h/n2/c5/children_as_table_structur'"></div>
+		</div>
+	</div>
+</div>
+
+<!-- 
 <div class="w3-code w3-tiny">{{oo}}</div>
+ -->
