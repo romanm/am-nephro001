@@ -1,3 +1,21 @@
 <div>
-json2table_table_data
+	<span class="w3-tiny am-b"> Таблиці: </span> <span
+		data-ng-repeat="(k,v) in doc_data_workdata.elementsMap"
+		data-ng-if="[18,27,37].indexOf(v.doctype)>=0"> <a
+		href="?jsonId={{request.parameters.jsonId}}&tab1=table_data&tableId={{k}}"
+		data-ng-class="{'w3-border-top w3-border-blue-gray':request.parameters.tableId==k}">
+			{{k}} {{v.value}} </a> ,
+	</span>
+	<div>
+		<table>
+			<tr class="w3-tiny w3-blue-gray">
+			<th>☰</th>
+				<th
+					data-ng-repeat="col in doc_data_workdata.elementsMap[request.parameters.tableId].children">
+					{{col.value}}</th>
+			</tr>
+		</table>
+		{{doc_data_workdata.elementsMap[request.parameters.tableId]}}
+	</div>
 </div>
+json2table_table_data
