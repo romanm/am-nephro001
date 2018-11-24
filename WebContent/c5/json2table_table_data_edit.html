@@ -1,0 +1,22 @@
+<div>
+	<div class="w3-row-padding w3-border-bottom">
+		<div class="w3-col m4 l4 s4 ">
+			<button class="w3-border" data-ng-click="edit_table.saveEditRow()">OK
+				запис</button>
+			<button class="w3-border"
+				ng-click="edit_table.ngStyleModal={display:'none'}">Cancel</button>
+		</div>
+		<div class="w3-col m8 l8 s8 ">Діалог редагування</div>
+	</div>
+	<div class="w3-row">
+		<div class="w3-half">
+			<div data-ng-repeat="table_column in table.children">
+				<div class="w3-tiny am-b">{{table_column.value}}</div>
+				<input class="w3-border"
+					data-ng-model="edit_table.editRow[table_column.doc_id]">
+			</div>
+		</div>
+		<div class="w3-half">a1</div>
+	</div>
+	<div class="w3-code w3-tiny">{{table}}</div>
+</div>
