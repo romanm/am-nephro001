@@ -10,6 +10,63 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 	$scope.edit_table.saveEditRow = function(){
 		console.log(this)
 		console.log(this.editRow)
+		if(this.editRow.row_id){
+			updateRow(this.editRow)
+		}else{//INSERT row
+			updateRow(this.editRow, true)
+		}
+	}
+	sql_1c.insertCell = function(row_id, columnId, i){
+		var sql = "INSERT INTO doc (doctype, doc_id, parent, reference ) " +
+		"VALUES (5, :nextDbId" +i +", :nextDbId1, "+columnId +" );\n"
+		if(row_id){sql = sql.replace(/:nextDbId1/,row_id)}
+		return sql
+	}
+	sql_1c.select_row = function(table_join_select, row_id){
+		var sql = "SELECT * FROM (\n" + table_join_select +"\n" +") x WHERE row_id=:nextDbId1"
+		if(row_id){sql = sql.replace(/:nextDbId1/,row_id)}
+		return sql
+	}
+	var updateRow = function(editRow, isInsertRow){
+		var sql = '', i = 2
+		angular.forEach(editRow, function(v,k){
+			if(k.includes('col_')&&!k.includes('_id')){
+				var cellId = editRow[k+'_id']
+				if(cellId){//UPDATE value
+					sql += "UPDATE string SET value = '" + v +"' " +" WHERE string_id = "+cellId + ";\n " 
+				}else{//INSERT cell & value
+					console.log(editRow)
+					console.log(editRow.row_id)
+					sql += sql_1c.insertCell(editRow.row_id, k.replace('col_',''), i)
+					sql += "INSERT INTO string (value, string_id) VALUES ('"+v+"',:nextDbId" +i +" );\n"
+					i++
+				}
+			}
+		})
+		console.log($scope.table)
+		if(sql){
+			if(isInsertRow){
+				sql = "INSERT INTO doc (doctype, doc_id, parent, reference) " +
+				"VALUES (4, :nextDbId1, " + $scope.edit_table.table_data_id 
+				 + ", " +$scope.request.parameters.tableId+");\n" +
+				sql
+			}
+			sql += sql_1c.select_row($scope.table.join_select, editRow.row_id)
+			console.log(sql)
+			writeSql({sql : sql,
+				dataAfterSave:function(response){
+					console.log(response.data)
+				}
+			})
+		}
+	}
+	$scope.edit_table.minusRow = function(tr){
+		console.log(tr)
+	}
+	$scope.edit_table.editRow = function(tr){
+		console.log(tr)
+		this.editRow = tr
+		this.ngStyleModal = {display:'block'}
 	}
 	$scope.edit_table.addRow = function(){
 		this.ngStyleModal = {display:'block'}

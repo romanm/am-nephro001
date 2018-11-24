@@ -9,21 +9,34 @@
 	<div>
 		<table>
 			<tr class="w3-tiny w3-blue-gray">
-				<td><span class="w3-tiny w3-dropdown-hover w3-hover-shadow ">
+				<td><div class="w3-tiny w3-dropdown-hover w3-hover-shadow ">
 						☰
 						<div class="w3-dropdown-content w3-bar-block w3-border w3-tiny"
-							style="left: -5px; width: 180px">
+							style="left: -5px;">
 							<div>
 								<a href="#" ng-click="edit_table.addRow(table)"
 									title="Додати запис" class="w3-button"><i
 									class="fa fa-plus"></i></a>
 							</div>
 						</div>
-				</span></td>
+				</div></td>
 				<th data-ng-repeat="col in table.children">{{col.value}}</th>
 			</tr>
 			<tr data-ng-repeat="tr in table_data.list">
-				<td>
+				<td><div class="w3-tiny w3-dropdown-hover w3-hover-shadow ">
+						☰
+						<div class="w3-dropdown-content w3-bar-block w3-border w3-tiny"
+							style="left: -5px;">
+							<div>
+								<a href="#" ng-click="edit_table.editRow(tr)"
+									title="Додати запис" class="w3-button"><i
+									class="fa fa-pencil-square-o"></i></a>
+								<a href="#" ng-click="edit_table.minusRow(tr)"
+									title="Додати запис" class="w3-button"><i
+									class="fa fa-minus"></i></a>
+							</div>
+						</div>
+				</div>
 				</td>
 				<td data-ng-repeat="col in table.children">
 				{{tr['col_'+col.doc_id]}}

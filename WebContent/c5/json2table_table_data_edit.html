@@ -13,7 +13,7 @@
 			<div data-ng-repeat="table_column in table.children">
 				<div class="w3-tiny am-b">{{table_column.value}}</div>
 				<input class="w3-border"
-					data-ng-model="edit_table.editRow[table_column.doc_id]">
+					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
 			</div>
 		</div>
 		<div class="w3-half">a1</div>
