@@ -35,33 +35,51 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				if(cellId){//UPDATE value
 					sql += "UPDATE string SET value = '" + v +"' " +" WHERE string_id = "+cellId + ";\n " 
 				}else{//INSERT cell & value
-					console.log(editRow)
-					console.log(editRow.row_id)
 					sql += sql_1c.insertCell(editRow.row_id, k.replace('col_',''), i)
 					sql += "INSERT INTO string (value, string_id) VALUES ('"+v+"',:nextDbId" +i +" );\n"
 					i++
 				}
 			}
 		})
-		console.log($scope.table)
 		if(sql){
 			if(isInsertRow){
 				sql = "INSERT INTO doc (doctype, doc_id, parent, reference) " +
-				"VALUES (4, :nextDbId1, " + $scope.edit_table.table_data_id 
-				 + ", " +$scope.request.parameters.tableId+");\n" +
+				"VALUES (4, :nextDbId1, " + $scope.edit_table.table_data_id
+				+ ", " +$scope.request.parameters.tableId+");\n" +
 				sql
 			}
 			sql += sql_1c.select_row($scope.table.join_select, editRow.row_id)
-			console.log(sql)
+//			console.log(sql)
 			writeSql({sql : sql,
 				dataAfterSave:function(response){
-					console.log(response.data)
-				}
-			})
+					if(response.data.sql.indexOf('(4')>0){
+						angular.forEach(response.data, function(v,k){
+							if(k.indexOf('list')==0){
+								console.log(v[0])
+								$scope.table_data.list.splice(0,0,v[0])
+			}	})	}	}	})
 		}
 	}
-	$scope.edit_table.minusRow = function(tr){
+	$scope.edit_table.trashRow = function(tr){
 		console.log(tr)
+		var sql = "DELETE FROM doc WHERE parent="+tr.row_id+";\n"
+		sql += "DELETE FROM doc WHERE doc_id="+tr.row_id+";\n"
+		console.log(sql)
+		writeSql({sql : sql,
+			dataAfterSave:function(response){
+				console.log(response.data)
+				console.log(response.data.update_0+response.data.update_1)
+				console.log(0<(response.data.update_0+response.data.update_1))
+				if(0<(response.data.update_0+response.data.update_1)){
+					console.log(response.data)
+					$scope.table_data.list.splice($scope.table_data.list.indexOf(tr),1)
+				}
+			}
+		})
+	}
+	$scope.edit_table.minusRow = function(tr){
+		this.editRow = tr
+		this.editRow.toTrash = true
 	}
 	$scope.edit_table.editRow = function(tr){
 		console.log(tr)

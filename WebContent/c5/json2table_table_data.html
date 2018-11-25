@@ -30,14 +30,15 @@
 							<div>
 								<a href="#" ng-click="edit_table.editRow(tr)"
 									title="Додати запис" class="w3-button"><i
-									class="fa fa-pencil-square-o"></i></a>
-								<a href="#" ng-click="edit_table.minusRow(tr)"
-									title="Додати запис" class="w3-button"><i
-									class="fa fa-minus"></i></a>
+									class="fa fa-pencil-square-o"></i></a> <a href="#"
+									ng-click="edit_table.minusRow(tr)" title="Видалити запис"
+									class="w3-button"><i class="fa fa-minus"></i></a> <a href="#"
+									ng-click="edit_table.trashRow(tr)" data-ng-if="tr.toTrash"
+									title="Видалити запис в корзину" class="w3-button w3-border w3-border-red"><i
+									class="fa fa-trash-o"></i></a>
 							</div>
 						</div>
-				</div>
-				</td>
+					</div></td>
 				<td data-ng-repeat="col in table.children">
 				{{tr['col_'+col.doc_id]}}
 				</td>
