@@ -16,14 +16,14 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 			updateRow(this.editRow, true)
 		}
 	}
-	sql_1c.insertCell = function(row_id, columnId, i){
-		var sql = "INSERT INTO doc (doctype, doc_id, parent, reference ) " +
-		"VALUES (5, :nextDbId" +i +", :nextDbId1, "+columnId +" );\n"
+	sql_1c.select_row = function(table_join_select, row_id){
+		var sql = "SELECT * FROM (\n" + table_join_select +"\n" +") x WHERE row_id=:nextDbId1"
 		if(row_id){sql = sql.replace(/:nextDbId1/,row_id)}
 		return sql
 	}
-	sql_1c.select_row = function(table_join_select, row_id){
-		var sql = "SELECT * FROM (\n" + table_join_select +"\n" +") x WHERE row_id=:nextDbId1"
+	sql_1c.insertCell = function(row_id, columnId, i){
+		var sql = "INSERT INTO doc (doctype, doc_id, parent, reference ) " +
+		"VALUES (5, :nextDbId" +i +", :nextDbId1, "+columnId +" );\n"
 		if(row_id){sql = sql.replace(/:nextDbId1/,row_id)}
 		return sql
 	}
@@ -31,12 +31,30 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		var sql = '', i = 2
 		angular.forEach(editRow, function(v,k){
 			if(k.includes('col_')&&!k.includes('_id')){
-				var cellId = editRow[k+'_id']
+				var cellId = editRow[k+'_id'],
+				columnId = k.replace('col_',''),
+				columnObj = $scope.doc_data_workdata.elementsMap[columnId]
+				console.log(columnObj)
+				console.log(columnObj.doctype)
 				if(cellId){//UPDATE value
-					sql += "UPDATE string SET value = '" + v +"' " +" WHERE string_id = "+cellId + ";\n " 
+					switch (columnObj.doctype) {
+					case 22:
+						sql += "UPDATE string SET value = '" + v +"' " +" WHERE string_id = "+cellId + ";\n "
+						break;
+					case 23:
+						sql += "UPDATE integer SET value = " + v +" " +" WHERE integer_id = "+cellId + ";\n "
+						break;
+					}
 				}else{//INSERT cell & value
-					sql += sql_1c.insertCell(editRow.row_id, k.replace('col_',''), i)
-					sql += "INSERT INTO string (value, string_id) VALUES ('"+v+"',:nextDbId" +i +" );\n"
+					sql += sql_1c.insertCell(editRow.row_id, columnId, i)
+					switch (columnObj.doctype) {
+					case 22:
+						sql += "INSERT INTO string (value, string_id) VALUES ('"+v+"',:nextDbId" +i +" );\n"
+						break;
+					case 23:
+						sql += "INSERT INTO integer (value, integer_id) VALUES ("+v+",:nextDbId" +i +" );\n"
+						break;
+					}
 					i++
 				}
 			}
@@ -49,7 +67,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				sql
 			}
 			sql += sql_1c.select_row($scope.table.join_select, editRow.row_id)
-//			console.log(sql)
+			console.log(sql)
+			/*
+			 * 
 			writeSql({sql : sql,
 				dataAfterSave:function(response){
 					if(response.data.sql.indexOf('(4')>0){
@@ -58,6 +78,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 								console.log(v[0])
 								$scope.table_data.list.splice(0,0,v[0])
 			}	})	}	}	})
+			 */
 		}
 	}
 	$scope.edit_table.trashRow = function(tr){
@@ -90,6 +111,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		this.ngStyleModal = {display:'block'}
 		this.editRow = {}
 	}
+	$scope.edit_table.keyUp = function($event){
+		console.log($event.key)
+	}
 	
 	$scope.create_tables = {}
 	$scope.create_tables.col_keys = {}
@@ -100,8 +124,8 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 
 	var build_sql_table_read = $interval(function () {
 		if(Object.keys($scope.doc_data_workdata.elementsMap).length>0){
-			$interval.cancel(build_sql_table_read)
 			if($scope.doc_data_workdata.elementsMap[$scope.request.parameters.tableId]){
+				$interval.cancel(build_sql_table_read)
 				$scope.table = $scope.doc_data_workdata.elementsMap[$scope.request.parameters.tableId]
 				//console.log($scope.table)
 				$scope.table.row_columns = 'r.doc_id row_id'
@@ -118,17 +142,18 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 					//console.log(v.cell_select)
 					//console.log(v)
 				})
+				console.log($scope.doc_data_workdata.elementsMap)
 				//console.log($scope.table.row_columns)
 				$scope.table.join_select = "SELECT "+$scope.table.row_columns+" "+$scope.table.join_select
 				+" WHERE r.parent="+$scope.edit_table.table_data_id
-				console.log($scope.table.join_select)
+				//console.log($scope.table.join_select)
 				$scope.table_data = readSql({
 					sql:$scope.table.join_select,
 				})
-				console.log($scope.table_data)
+				//console.log($scope.table_data)
 			}
 		}
-	}, 300);
+	}, 250);
 
 	readSql({
 		sql:sql_1c.read_doc_table_data_id($scope.request.parameters.jsonId),

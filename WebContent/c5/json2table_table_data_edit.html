@@ -10,9 +10,12 @@
 	</div>
 	<div class="w3-row">
 		<div class="w3-half">
-			<div data-ng-repeat="table_column in table.children">
+			<div data-ng-repeat="table_column in table.children"
+				data-ng-switch="table_column.doctype">
 				<div class="w3-tiny am-b">{{table_column.value}}</div>
-				<input class="w3-border"
+				<input class="w3-border" data-ng-switch-when="22"
+					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
+				<input class="w3-border" data-ng-switch-when="23" type="number"
 					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
 			</div>
 		</div>

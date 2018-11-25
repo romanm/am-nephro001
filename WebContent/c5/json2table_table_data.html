@@ -22,7 +22,7 @@
 				</div></td>
 				<th data-ng-repeat="col in table.children">{{col.value}}</th>
 			</tr>
-			<tr data-ng-repeat="tr in table_data.list"
+			<tr data-ng-repeat="tr in table_data.list" class="w3-hover-shadow"
 				data-ng-class="{'w3-text-red':tr.toTrash}">
 				<td><div class="w3-tiny w3-dropdown-hover w3-hover-shadow ">
 						☰
@@ -30,7 +30,7 @@
 							style="left: -5px;">
 							<div>
 								<a href="#" ng-click="edit_table.editRow(tr)"
-									title="Додати запис" class="w3-button"><i
+									title="Редагувати запис " class="w3-button"><i
 									class="fa fa-pencil-square-o"></i></a> <a href="#"
 									ng-click="edit_table.minusRow(tr)" title="Видалити запис"
 									class="w3-button"><i class="fa fa-minus"></i></a> <a href="#"
@@ -41,7 +41,8 @@
 							</div>
 						</div>
 					</div></td>
-				<td data-ng-repeat="col in table.children">
+				<td data-ng-repeat="col in table.children"
+					ng-keyup="edit_table.keyUp($event)">
 					{{tr['col_'+col.doc_id]}}</td>
 			</tr>
 		</table>
@@ -53,6 +54,8 @@
 					class="w3-button w3-display-topright">&times;</span>
 			</div>
 		</div>
-		<div class="w3-code w3-tiny">{{table}}</div>
+		<div class="w3-code w3-tiny">
+		$scope.table =
+		{{table}}</div>
 	</div>
 </div>
