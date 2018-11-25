@@ -22,7 +22,8 @@
 				</div></td>
 				<th data-ng-repeat="col in table.children">{{col.value}}</th>
 			</tr>
-			<tr data-ng-repeat="tr in table_data.list">
+			<tr data-ng-repeat="tr in table_data.list"
+				data-ng-class="{'w3-text-red':tr.toTrash}">
 				<td><div class="w3-tiny w3-dropdown-hover w3-hover-shadow ">
 						☰
 						<div class="w3-dropdown-content w3-bar-block w3-border w3-tiny"
@@ -34,14 +35,14 @@
 									ng-click="edit_table.minusRow(tr)" title="Видалити запис"
 									class="w3-button"><i class="fa fa-minus"></i></a> <a href="#"
 									ng-click="edit_table.trashRow(tr)" data-ng-if="tr.toTrash"
-									title="Видалити запис в корзину" class="w3-button w3-border w3-border-red"><i
+									title="Видалити запис в корзину"
+									class="w3-button w3-border w3-border-red"><i
 									class="fa fa-trash-o"></i></a>
 							</div>
 						</div>
 					</div></td>
 				<td data-ng-repeat="col in table.children">
-				{{tr['col_'+col.doc_id]}}
-				</td>
+					{{tr['col_'+col.doc_id]}}</td>
 			</tr>
 		</table>
 		<div ng-style="edit_table.ngStyleModal" class="w3-modal">
