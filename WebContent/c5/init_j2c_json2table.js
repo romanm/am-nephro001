@@ -67,9 +67,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				sql
 			}
 			sql += sql_1c.select_row($scope.table.join_select, editRow.row_id)
-			console.log(sql)
 			/*
-			 * 
+			 */
+			console.log(sql)
 			writeSql({sql : sql,
 				dataAfterSave:function(response){
 					if(response.data.sql.indexOf('(4')>0){
@@ -78,7 +78,6 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 								console.log(v[0])
 								$scope.table_data.list.splice(0,0,v[0])
 			}	})	}	}	})
-			 */
 		}
 	}
 	$scope.edit_table.trashRow = function(tr){
@@ -131,14 +130,20 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				$scope.table.row_columns = 'r.doc_id row_id'
 				$scope.table.join_select = 'FROM doc r'
 				angular.forEach($scope.table.children, function(v,k){
-					var row_columns = ', col_'+v.doc_id+', col_'+v.doc_id+'_id'
-					var cell_columns = 'value col_'+v.doc_id+', doc_id col_'+v.doc_id+'_id'
+					var columnId = v.doc_id,
+					columnObj = $scope.doc_data_workdata.elementsMap[columnId],
+					columnType = 
+						columnObj.doctype==22?'string':
+							(columnObj.doctype==23?'integer':''),
+					row_columns = ', col_'+columnId+', col_'+columnId+'_id',
+					cell_columns = 'value col_'+columnId+', doc_id col_'+columnId+'_id'
 					v.row_columns = row_columns
 					$scope.table.row_columns += row_columns
 					//console.log(row_columns)
-					v.cell_select = 'SELECT '+cell_columns+', parent FROM doc,string WHERE reference='+v.doc_id+' AND string_id=doc_id'
+					v.cell_select = "SELECT "+cell_columns+", parent FROM doc," +columnType +
+							" WHERE reference="+columnId+" AND " +columnType+"_id=doc_id"
 					$scope.table.join_select += "\n LEFT JOIN " +
-					"(" +v.cell_select +") c" +v.doc_id +" ON c" +v.doc_id +".parent=r.doc_id"
+					"(" +v.cell_select +") c" +columnId+" ON c" +columnId+".parent=r.doc_id"
 					//console.log(v.cell_select)
 					//console.log(v)
 				})
@@ -146,7 +151,8 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				//console.log($scope.table.row_columns)
 				$scope.table.join_select = "SELECT "+$scope.table.row_columns+" "+$scope.table.join_select
 				+" WHERE r.parent="+$scope.edit_table.table_data_id
-				//console.log($scope.table.join_select)
+				+" AND r.reference="+$scope.request.parameters.tableId
+				console.log($scope.table.join_select)
 				$scope.table_data = readSql({
 					sql:$scope.table.join_select,
 				})
