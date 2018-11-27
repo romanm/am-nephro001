@@ -1,7 +1,7 @@
 <div class="w3-row">
 	<div class="w3-half">
-		<div data-ng-repeat="oo in [doc_data_workdata.tableRoot.docRoot]" class=""
-			data-ng-include="'/r/h/n2/c5/children_as_table_structur'"></div>
+		<div data-ng-repeat="oo in [doc_data_workdata.tableRoot.docRoot]"
+			class="" data-ng-include="'/r/h/n2/c5/children_as_table_structur'"></div>
 	</div>
 	<div class="w3-half w3-container">
 		<div class="w3-tiny">
@@ -13,5 +13,12 @@
 			</a>
 		</div>
 		{{pageVar.config.tab2}}
+		<div class="w3-tiny" ng-if="pageVar.config.tab2=='table_structur_sql'">
+			<a href="#" ng-click="edit_table.saveSqlReadData()"
+				class="w3-btn w3-border w3-padding-small">save</a>
+			<textarea rows="25" class="am-width-100pr">
+{{table.join_select}}
+</textarea>
+		</div>
 	</div>
 </div>

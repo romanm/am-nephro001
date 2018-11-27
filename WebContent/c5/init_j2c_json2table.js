@@ -7,6 +7,25 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 	]
 	console.log($scope.pageVar.config)
 	$scope.edit_table = {}
+	$scope.edit_table.saveSqlReadData = function(){
+		var sqlSelect = "SELECT doc_id FROM doc  WHERE doctype=19" +
+		" AND parent=" +
+		$scope.request.parameters.jsonId +
+		" AND reference = " +
+		$scope.request.parameters.tableId +
+		""
+		var sql = "UPDATE docbody SET docbody = :select_table_data WHERE docbody_id IN (" +
+		sqlSelect +
+		")"
+		console.log(sql)
+		writeSql({
+			sql : sql,
+			select_table_data : $scope.table.join_select,
+			dataAfterSave : function(response){
+				console.log(response.data)
+			},
+		})
+	}
 	$scope.edit_table.saveEditRow = function(){
 		console.log(this)
 		console.log(this.editRow)

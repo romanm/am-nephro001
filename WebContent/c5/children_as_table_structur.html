@@ -1,6 +1,8 @@
 <div class="w3-row">
 	<div class="w3-half">
-		<div class="w3-tiny">table: {{oo.doc_id}}</div>
+		<div class="w3-tiny"
+			data-ng-class="{'w3-green':oo.doc_id==request.parameters.tableId}">table:
+			{{oo.doc_id}}</div>
 		<table class="w3-card">
 			<tr class="w3-tiny w3-blue-gray">
 				<th data-ng-repeat="(ck,cv) in create_tables.col_keys">{{cv}}</th>
