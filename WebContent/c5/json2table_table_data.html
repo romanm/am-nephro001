@@ -3,7 +3,7 @@
 		data-ng-repeat="(k,v) in doc_data_workdata.elementsMap"
 		data-ng-if="[18,27,37].indexOf(v.doctype)>=0"> <a
 		href="?jsonId={{request.parameters.jsonId}}&tab1=table_data&tableId={{k}}"
-		data-ng-class="{'w3-border-top w3-border-blue-gray':request.parameters.tableId==k}">
+		data-ng-class="{'w3-text-green w3-border-top w3-border-blue-gray':request.parameters.tableId==k}">
 			{{k}} {{v.value}} </a> ,
 	</span>
 	<div>
@@ -42,8 +42,8 @@
 						</div>
 					</div></td>
 				<td data-ng-repeat="col in table.children"
-					ng-keyup="edit_table.keyUp($event)">
-					{{tr['col_'+col.doc_id]}}</td>
+					ng-keyup="edit_table.keyUp($event)">{{tr['col_'+col.doc_id]}}
+					{{edit_table['view_'+col.doc_id](tr)}}</td>
 			</tr>
 		</table>
 		<div ng-style="edit_table.ngStyleModal" class="w3-modal">

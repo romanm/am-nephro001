@@ -5,26 +5,24 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		{tab2:'table_structur_sql',fa:'wrench',},
 		{tab2:'table_data_sql',fa:'th-list',},
 	]
-	console.log($scope.pageVar.config)
+//	console.log($scope.pageVar.config)
 	$scope.edit_table = {}
 	$scope.edit_table.saveSqlReadData = function(){
-		var sqlSelect = "SELECT doc_id FROM doc  WHERE doctype=19" +
-		" AND parent=" +
-		$scope.request.parameters.jsonId +
-		" AND reference = " +
-		$scope.request.parameters.tableId +
-		""
-		var sql = "UPDATE docbody SET docbody = :select_table_data WHERE docbody_id IN (" +
-		sqlSelect +
-		")"
+		var sqlSelect = "SELECT doc_id FROM doc  WHERE doctype=19 " +
+		" AND parent=" + $scope.request.parameters.jsonId +
+		" AND reference = " + $scope.request.parameters.tableId + ""
+		var sql = "UPDATE docbody SET docbody = :select_table_data " +
+		" WHERE docbody_id IN (" + sqlSelect + ")"
 		console.log(sql)
-		writeSql({
-			sql : sql,
+		writeSql({ sql : sql,
 			select_table_data : $scope.table.join_select,
 			dataAfterSave : function(response){
 				console.log(response.data)
 			},
 		})
+	}
+	$scope.edit_table.view_57483 = function(tr){
+		return tr.col_57488+" - "+tr.col_57489
 	}
 	$scope.edit_table.saveEditRow = function(){
 		console.log(this)
@@ -140,45 +138,80 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 	$scope.create_tables.col_keys.value='Колонка',
 	$scope.create_tables.col_keys.doctype='Тип даних'
 
+	var getLeftJoinCellSelect = function (cell_select, columnId) {
+		return " LEFT JOIN " + "(" + cell_select +") c" +columnId+" ON c" +columnId+".parent=r.doc_id"
+	}
+
 	var build_sql_table_read = $interval(function () {
 		if(Object.keys($scope.doc_data_workdata.elementsMap).length>0){
 			if($scope.doc_data_workdata.elementsMap[$scope.request.parameters.tableId]){
 				$interval.cancel(build_sql_table_read)
 				$scope.table = $scope.doc_data_workdata.elementsMap[$scope.request.parameters.tableId]
 				//console.log($scope.table)
-				$scope.table.row_columns = 'r.doc_id row_id'
+				$scope.table.row_columns = "r.doc_id row_" + $scope.request.parameters.tableId + "_id"
 				$scope.table.join_select = 'FROM doc r'
+				var list27 = []
 				angular.forEach($scope.table.children, function(v,k){
-					var columnId = v.doc_id,
-					columnObj = $scope.doc_data_workdata.elementsMap[columnId],
-					columnType = 
-						columnObj.doctype==22?'string':
+					var columnId = v.doc_id
+//					console.log(v.doctype)
+					if(27==v.doctype){
+						list27.push(v.doc_id)
+					}else{
+						var columnObj = $scope.doc_data_workdata.elementsMap[columnId],
+						columnType = 
+							columnObj.doctype==22?'string':
 							(columnObj.doctype==23?'integer':''),
-					row_columns = ', col_'+columnId+', col_'+columnId+'_id',
-					cell_columns = 'value col_'+columnId+', doc_id col_'+columnId+'_id'
-					v.row_columns = row_columns
-					$scope.table.row_columns += row_columns
-					//console.log(row_columns)
-					v.cell_select = "SELECT "+cell_columns+", parent FROM doc," +columnType +
-							" WHERE reference="+columnId+" AND " +columnType+"_id=doc_id"
-					$scope.table.join_select += "\n LEFT JOIN " +
-					"(" +v.cell_select +") c" +columnId+" ON c" +columnId+".parent=r.doc_id"
+						row_columns = ', col_'+columnId+', col_'+columnId+'_id',
+						cell_columns = 'value col_'+columnId+', doc_id col_'+columnId+'_id'
+						v.row_columns = row_columns
+						$scope.table.row_columns += row_columns
+						//console.log(row_columns)
+						v.cell_select = "SELECT "+cell_columns+", parent FROM doc, " +columnType +
+						" WHERE reference="+columnId+" AND " +columnType+"_id=doc_id\n "
+						$scope.table.join_select += getLeftJoinCellSelect(v.cell_select, columnId)
+					}
 					//console.log(v.cell_select)
 					//console.log(v)
 				})
-				console.log($scope.doc_data_workdata.elementsMap)
+				console.log(list27.toString())
+//				console.log($scope.doc_data_workdata.elementsMap)
 				//console.log($scope.table.row_columns)
-				$scope.table.join_select = "SELECT "+$scope.table.row_columns+" "+$scope.table.join_select
-				+" WHERE r.parent="+$scope.edit_table.table_data_id
-				+" AND r.reference="+$scope.request.parameters.tableId
-				console.log($scope.table.join_select)
-				$scope.table_data = readSql({
-					sql:$scope.table.join_select,
-				})
 				//console.log($scope.table_data)
+				if(list27.length>0){
+					var sql27 = "SELECT * FROM doc,docbody " +
+					"WHERE doc_id=docbody_id AND reference IN (" +list27.toString() + ") AND doctype=19 "
+					readSql({ sql:sql27,
+						afterRead:function(response){
+							console.log(response.data)
+							angular.forEach(response.data.list, function(v){
+								var columnId = v.reference
+								var sql = "SELECT refCell.*, cell.doc_id col_" +columnId+"_id, cell.parent \n" +
+								"FROM doc cell, (" + v.docbody +") refCell \n" +
+								"WHERE cell.reference2=refCell.row_" +columnId+"_id"
+//								console.log(sql)
+//								console.log(v)
+								$scope.table.row_columns += ", c"+columnId+".* "
+								$scope.table.join_select += getLeftJoinCellSelect(sql, columnId)
+							})
+							$scope.table_data = readTableData($scope.table.join_select)
+						}
+					})
+				}else{
+					$scope.table_data = readTableData($scope.table.join_select)
+				}
 			}
 		}
 	}, 250);
+
+	var readTableData = function(join_select){
+		join_select = "SELECT "+$scope.table.row_columns+" "+join_select+"\n " +
+		"WHERE r.parent="+$scope.edit_table.table_data_id
+		+" AND r.reference="+$scope.request.parameters.tableId
+		console.log(join_select)
+		return readSql({
+			sql:join_select,
+		})
+	}
 
 	readSql({
 		sql:sql_1c.read_doc_table_data_id($scope.request.parameters.jsonId),
@@ -187,7 +220,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		},
 	})
 
-	console.log($scope.create_tables)
+//	console.log($scope.create_tables)
 }
 sql_1c.read_doc_table_data_id = function(doc_id){
 	return "SELECT * FROM doc where :doc_id in (doc_id,parent) and doctype=47".replace(':doc_id',doc_id)
