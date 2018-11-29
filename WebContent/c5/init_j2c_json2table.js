@@ -21,6 +21,19 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 			},
 		})
 	}
+	$scope.edit_table.onFocus27 = function(col_id){
+//		console.log(col_id)
+		this.focus_col_id = col_id
+//		console.log($scope.doc_data_workdata.elementsMap[$scope.edit_table.focus_col_id])
+		var dd_sql = this.datadictionary_sql[col_id]
+//		console.log(dd_sql)
+		if(!this.dd_list)
+			this.dd_list = {}
+		console.log(this.dd_list)
+		this.dd_list[col_id] = readSql({
+			sql:dd_sql,
+		})
+	}
 	$scope.edit_table.view_57483 = function(tr){
 		return tr.col_57488+" - "+tr.col_57489
 	}
@@ -180,6 +193,8 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				if(list27.length>0){
 					var sql27 = "SELECT * FROM doc,docbody " +
 					"WHERE doc_id=docbody_id AND reference IN (" +list27.toString() + ") AND doctype=19 "
+					if(!$scope.edit_table.datadictionary_sql)
+						$scope.edit_table.datadictionary_sql = {}
 					readSql({ sql:sql27,
 						afterRead:function(response){
 							console.log(response.data)
@@ -188,28 +203,29 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 								var sql = "SELECT refCell.*, cell.doc_id col_" +columnId+"_id, cell.parent \n" +
 								"FROM doc cell, (" + v.docbody +") refCell \n" +
 								"WHERE cell.reference2=refCell.row_" +columnId+"_id"
+								$scope.edit_table.datadictionary_sql[columnId] = v.docbody
 //								console.log(sql)
 //								console.log(v)
 								$scope.table.row_columns += ", c"+columnId+".* "
 								$scope.table.join_select += getLeftJoinCellSelect(sql, columnId)
 							})
-							$scope.table_data = readTableData($scope.table.join_select)
+							$scope.table_data = readTableData()
 						}
 					})
 				}else{
-					$scope.table_data = readTableData($scope.table.join_select)
+					$scope.table_data = readTableData()
 				}
 			}
 		}
 	}, 250);
 
-	var readTableData = function(join_select){
-		join_select = "SELECT "+$scope.table.row_columns+" "+join_select+"\n " +
+	var readTableData = function(){
+		$scope.table.join_select = "SELECT "+$scope.table.row_columns+" "+$scope.table.join_select+"\n " +
 		"WHERE r.parent="+$scope.edit_table.table_data_id
 		+" AND r.reference="+$scope.request.parameters.tableId
-		console.log(join_select)
+		//console.log($scope.table.join_select)
 		return readSql({
-			sql:join_select,
+			sql:$scope.table.join_select,
 		})
 	}
 

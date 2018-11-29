@@ -13,13 +13,35 @@
 			<div data-ng-repeat="table_column in table.children"
 				data-ng-switch="table_column.doctype">
 				<div class="w3-tiny am-b">{{table_column.value}}</div>
+				<div data-ng-switch-when="27">
+					<div class="w3-border w3-tiny">
+						{{edit_table['view_'+table_column.doc_id](edit_table.editRow)}}</div>
+					<input class="w3-border" data-ng-focus="edit_table.onFocus27(table_column.doc_id)"
+						data-ng-model="edit_table.editRow['seek_col_'+table_column.doc_id]">
+				</div>
 				<input class="w3-border" data-ng-switch-when="22"
 					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
 				<input class="w3-border" data-ng-switch-when="23" type="number"
 					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
 			</div>
 		</div>
-		<div class="w3-half">a1</div>
+		<div class="w3-half">
+			<table>
+				<tr class="w3-tiny w3-gray">
+					<th
+						data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children">
+						{{col.value}}</th>
+				</tr>
+				<tr class="w3-hover-shadow"
+					data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
+					<td
+						data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children">
+						{{tr['col_'+col.doc_id]}}</td>
+				</tr>
+			</table>
+		</div>
 	</div>
+	<!-- 
 	<div class="w3-code w3-tiny">{{table}}</div>
+	 -->
 </div>
