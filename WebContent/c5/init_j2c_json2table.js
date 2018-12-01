@@ -21,29 +21,21 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 			},
 		})
 	}
-	$scope.edit_table.onFocus27 = function(col_id){
-//		console.log(col_id)
-		this.focus_col_id = col_id
-//		console.log($scope.doc_data_workdata.elementsMap[$scope.edit_table.focus_col_id])
-		var dd_sql = this.datadictionary_sql[col_id]
-//		console.log(dd_sql)
-		if(!this.dd_list)
-			this.dd_list = {}
-		console.log(this.dd_list)
-		this.dd_list[col_id] = readSql({
-			sql:dd_sql,
-		})
+
+	$scope.edit_table.view_57482 = function(tr){
+		return tr.col_57486+" - "+tr.col_57487
 	}
 	$scope.edit_table.view_57483 = function(tr){
 		return tr.col_57488+" - "+tr.col_57489
 	}
 	$scope.edit_table.saveEditRow = function(){
+		this.editRow.row_id = this.editRow['row_'+$scope.request.parameters.tableId+'_id']
 		console.log(this)
 		console.log(this.editRow)
 		if(this.editRow.row_id){
-			updateRow(this.editRow)
+			saveRow(this.editRow)
 		}else{//INSERT row
-			updateRow(this.editRow, true)
+			saveRow(this.editRow, true)
 		}
 	}
 	sql_1c.select_row = function(table_join_select, row_id){
@@ -57,7 +49,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		if(row_id){sql = sql.replace(/:nextDbId1/,row_id)}
 		return sql
 	}
-	var updateRow = function(editRow, isInsertRow){
+	var saveRow = function(editRow, isInsertRow){
 		var sql = '', i = 2
 		angular.forEach(editRow, function(v,k){
 			if(k.includes('col_')&&!k.includes('_id')){
@@ -68,6 +60,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				console.log(columnObj.doctype)
 				if(cellId){//UPDATE value
 					switch (columnObj.doctype) {
+					case 27:
+						sql += "UPDATE doc SET reference2 = " + v +" " +" WHERE doc_id = "+cellId + ";\n "
+						break;
 					case 22:
 						sql += "UPDATE string SET value = '" + v +"' " +" WHERE string_id = "+cellId + ";\n "
 						break;
@@ -78,6 +73,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				}else{//INSERT cell & value
 					sql += sql_1c.insertCell(editRow.row_id, columnId, i)
 					switch (columnObj.doctype) {
+					case 27:
+						sql += "UPDATE doc SET reference2 = " + v +" " +" WHERE doc_id = :nextDbId"+i + " ;\n "
+						break;
 					case 22:
 						sql += "INSERT INTO string (value, string_id) VALUES ('"+v+"',:nextDbId" +i +" );\n"
 						break;
@@ -131,14 +129,74 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		this.editRow = tr
 		this.editRow.toTrash = true
 	}
+	$scope.edit_table.addRow = function(){
+		this.ngStyleModal = {display:'block'}
+		this.editRow = {}
+	}
 	$scope.edit_table.editRow = function(tr){
 		console.log(tr)
 		this.editRow = tr
 		this.ngStyleModal = {display:'block'}
+		if(!this.ddListener)
+			this.ddListener = {}
+		angular.forEach(this.datadictionary_sql, function(v){
+			console.log(v)
+		})
 	}
-	$scope.edit_table.addRow = function(){
-		this.ngStyleModal = {display:'block'}
-		this.editRow = {}
+	$scope.edit_table.ddUpdateCell = function(tr){
+		console.log(tr)
+		console.log(this.editRow)
+		console.log(this.focus_col_id)
+		var rowId = 'row_'+this.focus_col_id+'_id'
+		if(!this.editRow[rowId]){
+			//insert new
+		}
+		this.editRow[rowId] = tr[rowId]
+		this.editRow['col_'+this.focus_col_id] = tr[rowId]
+	}
+	$scope.edit_table.closeEditRow = function(){
+		this.ngStyleModal = {display:'none'}
+		angular.forEach($scope.edit_table.ddListener, function(v){
+			v()//closeWatch
+		})
+	}
+	$scope.edit_table.onFocus27 = function(col_id){
+//		console.log(col_id)
+		this.focus_col_id = col_id
+//		console.log($scope.doc_data_workdata.elementsMap[$scope.edit_table.focus_col_id])
+		var dd_sql = this.datadictionary_sql[col_id]
+		console.log(dd_sql)
+		if(!this.dd_list)
+			this.dd_list = {}
+		console.log(this.dd_list)
+		this.dd_list[col_id] = readSql({
+			sql:dd_sql,
+		})
+		if(!$scope.edit_table.ddListener['l_'+col_id]){
+			var tableObj = $scope.doc_data_workdata.elementsMap[col_id]
+			console.log(tableObj)
+			var seekLike = ''
+			angular.forEach(tableObj.children, function(v){
+				console.log(v)
+				if(seekLike.length>0) seekLike += " OR "
+				seekLike += " LOWER(col_" +v.doc_id +") LIKE LOWER(:seek)"
+			})
+			var dd_seek_sql = "SELECT * FROM (" +dd_sql +") WHERE "+seekLike
+			console.log(dd_seek_sql)
+			$scope.edit_table.ddListener['l_'+col_id] = 
+				$scope.$watch('edit_table.editRow.seek_col_'+col_id, function(newValue){
+				if(newValue&&newValue.length>0){
+					console.log(newValue)
+					$scope.edit_table.dd_list[col_id] = readSql({
+						sql:dd_seek_sql,
+						seek:'%'+newValue+'%',
+					})
+				}else{
+					$scope.edit_table.dd_list[col_id] = readSql({
+						sql:dd_sql,
+					})
+				}})
+		}
 	}
 	$scope.edit_table.keyUp = function($event){
 		console.log($event.key)
@@ -152,7 +210,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 	$scope.create_tables.col_keys.doctype='Тип даних'
 
 	var getLeftJoinCellSelect = function (cell_select, columnId) {
-		return " LEFT JOIN " + "(" + cell_select +") c" +columnId+" ON c" +columnId+".parent=r.doc_id"
+		return "\n LEFT JOIN " + "(" + cell_select +") c" +columnId+" ON c" +columnId+".parent=r.doc_id"
 	}
 
 	var build_sql_table_read = $interval(function () {
@@ -223,7 +281,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		$scope.table.join_select = "SELECT "+$scope.table.row_columns+" "+$scope.table.join_select+"\n " +
 		"WHERE r.parent="+$scope.edit_table.table_data_id
 		+" AND r.reference="+$scope.request.parameters.tableId
-		//console.log($scope.table.join_select)
+		console.log($scope.table.join_select)
 		return readSql({
 			sql:$scope.table.join_select,
 		})

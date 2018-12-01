@@ -3,40 +3,51 @@
 		<div class="w3-col m4 l4 s4 ">
 			<button class="w3-border" data-ng-click="edit_table.saveEditRow()">OK
 				запис</button>
-			<button class="w3-border"
-				ng-click="edit_table.ngStyleModal={display:'none'}">Cancel</button>
+			<button class="w3-border" ng-click="edit_table.closeEditRow()">Cancel</button>
 		</div>
 		<div class="w3-col m8 l8 s8 ">Діалог редагування</div>
 	</div>
 	<div class="w3-row">
 		<div class="w3-half">
 			<div data-ng-repeat="table_column in table.children"
+				data-ng-class="{
+				'w3-border-left w3-border-top w3-border-bottom':edit_table.focus_col_id==table_column.doc_id,
+				'w3-border-right':table_column.doc_id!=edit_table.focus_col_id,
+				}"
 				data-ng-switch="table_column.doctype">
-				<div class="w3-tiny am-b">{{table_column.value}}</div>
+				<div class="w3-tiny am-b"
+				data-ng-class="{'w3-text-green':edit_table.focus_col_id==table_column.doc_id}"
+				title="{{edit_table.focus_col_id}}=={{table_column.doc_id}}"
+				>{{table_column.value}}</div>
 				<div data-ng-switch-when="27">
-					<div class="w3-border w3-tiny">
+					<div class="w13-border w3-tiny" title="{{table_column.doc_id}}">
 						{{edit_table['view_'+table_column.doc_id](edit_table.editRow)}}</div>
-					<input class="w3-border" data-ng-focus="edit_table.onFocus27(table_column.doc_id)"
+					<input class="w3-border a1m-width-100pr"
+						data-ng-focus="edit_table.onFocus27(table_column.doc_id)"
 						data-ng-model="edit_table.editRow['seek_col_'+table_column.doc_id]">
+						<i class="fa fa-search" aria-hidden="true"></i>
 				</div>
-				<input class="w3-border" data-ng-switch-when="22"
+				<input class="w3-border am-width-100pr" data-ng-switch-when="22"
 					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
-				<input class="w3-border" data-ng-switch-when="23" type="number"
+				<input class="w3-border am-width-100pr" data-ng-switch-when="23" type="number"
 					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
 			</div>
 		</div>
 		<div class="w3-half">
 			<table>
 				<tr class="w3-tiny w3-gray">
-					<th
+					<th title="{{col.doc_id}}"
 						data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children">
 						{{col.value}}</th>
 				</tr>
 				<tr class="w3-hover-shadow"
+					data-ng-class="{'w3-text-green':tr['row_'+edit_table.focus_col_id+'_id'] == edit_table.editRow['row_'+edit_table.focus_col_id+'_id']}"
+					data-ng-click="edit_table.ddUpdateCell(tr)"
 					data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
 					<td
-						data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children">
-						{{tr['col_'+col.doc_id]}}</td>
+						data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children"
+						data-ng-bind-html="highlight(tr['col_' + col.doc_id], 
+						edit_table.editRow['seek_col_' + edit_table.focus_col_id])"></td>
 				</tr>
 			</table>
 		</div>
