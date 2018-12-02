@@ -30,8 +30,8 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 	}
 	$scope.edit_table.saveEditRow = function(){
 		this.editRow.row_id = this.editRow['row_'+$scope.request.parameters.tableId+'_id']
-		console.log(this)
-		console.log(this.editRow)
+		//console.log(this)
+		//console.log(this.editRow)
 		if(this.editRow.row_id){
 			saveRow(this.editRow)
 		}else{//INSERT row
@@ -51,6 +51,53 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 	}
 	var saveRow = function(editRow, isInsertRow){
 		var sql = '', i = 2
+		console.log(editRow)
+		var tableEl = $scope.doc_data_workdata.elementsMap[$scope.request.parameters.tableId]
+		//console.log(tableEl)
+		angular.forEach(tableEl.children, function(vt,k){
+//			console.log(vt)
+			var columnId = vt.doc_id,
+			columnObj = $scope.doc_data_workdata.elementsMap[columnId]
+			v = editRow['col_'+columnId]
+			cellId = editRow['col_'+columnId+'_id']
+//			console.log(columnObj)
+//			console.log(columnId+'/'+v+'/'+cellId)
+			var reference2 = editRow['row_'+columnId+'_id']
+//			console.log(reference2)
+			if(cellId){//UPDATE value
+				switch (columnObj.doctype) {
+				case 27:
+					if(reference2)
+					sql += "UPDATE doc SET reference2 = " + reference2 +" " +" WHERE doc_id = "+cellId + ";\n "
+					break;
+				case 22:
+					sql += "UPDATE string SET value = '" + v +"' " +" WHERE string_id = "+cellId + ";\n "
+					break;
+				case 23:
+					sql += "UPDATE integer SET value = " + v +" " +" WHERE integer_id = "+cellId + ";\n "
+					break;
+				}
+			}else{//INSERT cell & value
+				switch (columnObj.doctype) {
+				case 27:
+					if(reference2){
+						sql += sql_1c.insertCell(editRow.row_id, columnId, i)
+						sql += "UPDATE doc SET reference2 = " + v +" " +" WHERE doc_id = :nextDbId"+i + " ;\n "
+					}
+					break;
+				case 22:
+					sql += sql_1c.insertCell(editRow.row_id, columnId, i)
+					sql += "INSERT INTO string (value, string_id) VALUES ('"+v+"',:nextDbId" +i +" );\n"
+					break;
+				case 23:
+					sql += sql_1c.insertCell(editRow.row_id, columnId, i)
+					sql += "INSERT INTO integer (value, integer_id) VALUES ("+v+",:nextDbId" +i +" );\n"
+					break;
+				}
+				i++
+			}
+		})
+		if(false)
 		angular.forEach(editRow, function(v,k){
 			if(k.includes('col_')&&!k.includes('_id')){
 				var cellId = editRow[k+'_id'],
@@ -94,10 +141,11 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				+ ", " +$scope.request.parameters.tableId+");\n" +
 				sql
 			}
-			sql += sql_1c.select_row($scope.table.join_select, editRow.row_id)
 			/*
+			sql += sql_1c.select_row($scope.table.join_select, editRow.row_id)
 			 */
 			console.log(sql)
+			if(false)
 			writeSql({sql : sql,
 				dataAfterSave:function(response){
 					if(response.data.sql.indexOf('(4')>0){
