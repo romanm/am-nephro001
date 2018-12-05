@@ -2,15 +2,24 @@
 	<div class="w3-half">
 		<div class="w3-tiny"
 			data-ng-class="{'w3-green':oo.doc_id==request.parameters.tableId}">
-			<a href="?jsonId={{request.parameters.jsonId}}&tab1=table_structur&tableId={{oo.doc_id}}"> table: {{oo.doc_id}}</a>
+			table: <a
+				href="?jsonId={{request.parameters.jsonId}}&tab1=table_structur&tableId={{oo.doc_id}}"
+				data-ng-if="!oo.reference"> {{oo.doc_id}}</a> <a
+				href="?jsonId={{complex_types.map[oo.reference].parent}}&tab1=table_structur&tableId={{oo.reference}}"
+				class="am-b" data-ng-if="oo.reference">
+				{{complex_types.map[oo.reference].complex_type_name}}
+				{{complex_types.map[oo.reference].parent}} <i
+				class="fa fa-external-link" aria-hidden="true"></i>
+			</a>
 		</div>
 		<table class="w3-card">
 			<tr class="w3-tiny w3-blue-gray">
 				<th data-ng-repeat="(ck,cv) in create_tables.col_keys">{{cv}}</th>
 			</tr>
 			<tr data-ng-repeat="tr in oo.children">
-				<td data-ng-repeat="(ck,cv) in create_tables.col_keys">
-					{{tr[ck]}}</td>
+				<td data-ng-repeat="(ck,cv) in create_tables.col_keys"><span
+					class="am-b" data-ng-if="'value'==ck">
+						{{complex_types.map[tr.reference].complex_type_name}} </span> {{tr[ck]}}</td>
 			</tr>
 		</table>
 	</div>

@@ -16,24 +16,47 @@
 				}"
 				data-ng-switch="table_column.doctype">
 				<div class="w3-tiny am-b"
-				data-ng-class="{'w3-text-green':edit_table.focus_col_id==table_column.doc_id}"
-				title="{{edit_table.focus_col_id}}=={{table_column.doc_id}}"
-				>{{table_column.value}}</div>
-				<div data-ng-switch-when="27">
+					data-ng-class="{'w3-text-green':edit_table.focus_col_id==table_column.doc_id}"
+					title="{{edit_table.focus_col_id}}=={{table_column.doc_id}}">{{table_column.value}}</div>
+				<div data-ng-switch-when="27|57" ng-switch-when-separator="|">
 					<div class="w13-border w3-tiny" title="{{table_column.doc_id}}">
+{{edit_table.editRow['col_'+table_column.doc_id]}}
 						{{edit_table['view_'+table_column.doc_id](edit_table.editRow)}}</div>
 					<input class="w3-border a1m-width-100pr"
 						data-ng-focus="edit_table.onFocus27(table_column.doc_id)"
 						data-ng-model="edit_table.editRow['seek_col_'+table_column.doc_id]">
-						<i class="fa fa-search" aria-hidden="true"></i>
+					<i class="fa fa-search" aria-hidden="true"></i>
 				</div>
+				<!-- 
 				<input class="w3-border am-width-100pr" data-ng-switch-when="22"
+				 -->
+				<input class="w3-border am-width-100pr" data-ng-switch-default
 					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
-				<input class="w3-border am-width-100pr" data-ng-switch-when="23" type="number"
+				<input class="w3-border am-width-100pr" data-ng-switch-when="23"
+					type="number"
 					data-ng-model="edit_table.editRow['col_'+table_column.doc_id]">
+				<div>&nbsp;</div>
 			</div>
 		</div>
 		<div class="w3-half">
+		<div class="w3-code w3-tiny">
+		{{edit_table.editRow}}
+		</div>
+		{{edit_table.dd_list[edit_table.focus_col_id].list}}
+			<table 
+			data-ng-if="edit_table.dd_list[edit_table.focus_col_id].list[0].inn"
+			>
+				<tr class="w3-tiny w3-gray">
+					<th>INN, generic</th>
+				</tr>
+				<tr class="w3-hover-shadow"
+					data-ng-class="{'w3-text-green':tr.inn_id == edit_table.editRow['ref2_'+edit_table.focus_col_id]}"
+					data-ng-click="edit_table.ddUpdateINN(tr)"
+					data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
+					<td data-ng-bind-html="highlight(tr.inn, 
+						edit_table.editRow['seek_col_' + edit_table.focus_col_id])"></td>
+				</tr>
+			</table>
 			<table>
 				<tr class="w3-tiny w3-gray">
 					<th title="{{col.doc_id}}"
