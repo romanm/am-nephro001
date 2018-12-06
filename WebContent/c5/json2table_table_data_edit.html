@@ -39,40 +39,43 @@
 			</div>
 		</div>
 		<div class="w3-half">
-		<div class="w3-code w3-tiny">
-		{{edit_table.editRow}}
-		</div>
-		{{edit_table.dd_list[edit_table.focus_col_id].list}}
-			<table 
-			data-ng-if="edit_table.dd_list[edit_table.focus_col_id].list[0].inn"
-			>
-				<tr class="w3-tiny w3-gray">
-					<th>INN, generic</th>
-				</tr>
-				<tr class="w3-hover-shadow"
-					data-ng-class="{'w3-text-green':tr.inn_id == edit_table.editRow['ref2_'+edit_table.focus_col_id]}"
-					data-ng-click="edit_table.ddUpdateINN(tr)"
-					data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
-					<td data-ng-bind-html="highlight(tr.inn, 
+			<div style="height: 250px; overflow: auto;">
+				<table
+					data-ng-if="edit_table.dd_list[edit_table.focus_col_id].list[0].inn">
+					<thead>
+						<tr class="w3-tiny w3-gray">
+							<th>INN, generic</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="w3-hover-shadow"
+							data-ng-class="{'w3-text-green':tr.inn_id == edit_table.editRow['ref2_'+edit_table.focus_col_id]}"
+							data-ng-click="edit_table.ddUpdateINN(tr)"
+							data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
+							<td
+								data-ng-bind-html="highlight(tr.inn, 
 						edit_table.editRow['seek_col_' + edit_table.focus_col_id])"></td>
-				</tr>
-			</table>
-			<table>
-				<tr class="w3-tiny w3-gray">
-					<th title="{{col.doc_id}}"
-						data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children">
-						{{col.value}}</th>
-				</tr>
-				<tr class="w3-hover-shadow"
-					data-ng-class="{'w3-text-green':tr['row_'+edit_table.focus_col_id+'_id'] == edit_table.editRow['row_'+edit_table.focus_col_id+'_id']}"
-					data-ng-click="edit_table.ddUpdateCell(tr)"
-					data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
-					<td
-						data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children"
-						data-ng-bind-html="highlight(tr['col_' + col.doc_id], 
+						</tr>
+					</tbody>
+				</table>
+				<table>
+					<tr class="w3-tiny w3-gray">
+						<th title="{{col.doc_id}}"
+							data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children">
+							{{col.value}}</th>
+					</tr>
+					<tr class="w3-hover-shadow"
+						data-ng-class="{'w3-text-green':tr['row_'+edit_table.focus_col_id+'_id'] == edit_table.editRow['row_'+edit_table.focus_col_id+'_id']}"
+						data-ng-click="edit_table.ddUpdateCell(tr)"
+						data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
+						<td
+							data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children"
+							data-ng-bind-html="highlight(tr['col_' + col.doc_id], 
 						edit_table.editRow['seek_col_' + edit_table.focus_col_id])"></td>
-				</tr>
-			</table>
+					</tr>
+				</table>
+			</div>
+			<div>&nbsp;</div>
 		</div>
 	</div>
 	<!-- 

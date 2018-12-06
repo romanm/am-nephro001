@@ -227,7 +227,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 					})
 				}else{
 					$scope.edit_table.dd_list[col_id] = readSql({
-						sql:dd_sql,
+						sql:dd_sql+" LIMIT 55",
 					})
 				}})
 		}
