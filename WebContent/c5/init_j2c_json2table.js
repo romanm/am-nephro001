@@ -332,7 +332,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		+" AND r.reference="+$scope.request.parameters.tableId
 		console.log($scope.table.join_select)
 		return readSql({
-			sql:$scope.table.join_select,
+			sql:$scope.table.join_select + ' LIMIT 55',
 		})
 	}
 
