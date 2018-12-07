@@ -23,7 +23,7 @@
 {{edit_table.editRow['col_'+table_column.doc_id]}}
 						{{edit_table['view_'+table_column.doc_id](edit_table.editRow)}}</div>
 					<input class="w3-border a1m-width-100pr"
-						data-ng-focus="edit_table.onFocus27(table_column.doc_id)"
+						data-ng-focus="edit_table.onFocus27(table_column)"
 						data-ng-model="edit_table.editRow['seek_col_'+table_column.doc_id]">
 					<i class="fa fa-search" aria-hidden="true"></i>
 				</div>
@@ -58,10 +58,23 @@
 						</tr>
 					</tbody>
 				</table>
+				<!-- 
+{{edit_table.focus_col_id}}
+a2
+{{doc_data_workdata.elementsMap[edit_table.focus_col_id]}}
+a1
+{{edit_table.focus.structure}}
+a3
+{{edit_table.focus.structure.reference}}
+a333
+{{edit_table.focus.structure.children}}
+a3
+{{complex_types.map[doc_data_workdata.elementsMap[edit_table.focus_col_id].reference].tableRoot.docRoot}}
+				 -->
 				<table>
 					<tr class="w3-tiny w3-gray">
 						<th title="{{col.doc_id}}"
-							data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children">
+							data-ng-repeat="(k, col) in edit_table.focus.structure.children">
 							{{col.value}}</th>
 					</tr>
 					<tr class="w3-hover-shadow"
@@ -69,7 +82,7 @@
 						data-ng-click="edit_table.ddUpdateCell(tr)"
 						data-ng-repeat="tr in edit_table.dd_list[edit_table.focus_col_id].list">
 						<td
-							data-ng-repeat="(k, col) in doc_data_workdata.elementsMap[edit_table.focus_col_id].children"
+							data-ng-repeat="(k, col) in edit_table.focus.structure.children"
 							data-ng-bind-html="highlight(tr['col_' + col.doc_id], 
 						edit_table.editRow['seek_col_' + edit_table.focus_col_id])"></td>
 					</tr>

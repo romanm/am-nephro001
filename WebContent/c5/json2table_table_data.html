@@ -20,7 +20,10 @@
 							</div>
 						</div>
 				</div></td>
-				<th data-ng-repeat="col in table.children">{{col.value}}</th>
+				<th data-ng-repeat="col in table.children"><span class="am-b"
+					data-ng-if="col.reference">
+						{{complex_types.map[col.reference].complex_type_name}} </span>
+					{{col.value}}</th>
 			</tr>
 			<tr data-ng-repeat="tr in table_data.list" class="w3-hover-shadow"
 				data-ng-class="{'w3-text-red':tr.toTrash}">
@@ -54,6 +57,5 @@
 					class="w3-button w3-display-topright">&times;</span>
 			</div>
 		</div>
-		<div class="w3-code w3-tiny">$scope.table = {{table}}</div>
 	</div>
 </div>

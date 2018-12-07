@@ -2,7 +2,7 @@
 	<div class="w3-half">
 		<div class="w3-tiny"
 			data-ng-class="{'w3-green':oo.doc_id==request.parameters.tableId}">
-			table: <a
+			Структура таблиці: <a
 				href="?jsonId={{request.parameters.jsonId}}&tab1=table_structur&tableId={{oo.doc_id}}"
 				data-ng-if="!oo.reference"> {{oo.doc_id}}</a> <a
 				href="?jsonId={{complex_types.map[oo.reference].parent}}&tab1=table_structur&tableId={{oo.reference}}"
