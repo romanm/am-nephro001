@@ -22,6 +22,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		})
 	}
 
+	$scope.edit_table.view_57631 = function(tr){
+		return tr.col_57633+" (" +tr.col_57632 +")"
+	}
 	$scope.edit_table.view_57482 = function(tr){
 		return tr.col_57486+" - "+tr.col_57487
 	}
@@ -68,7 +71,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				switch (columnObj.doctype) {
 				case 27:
 					if(reference2)
-					sql += "UPDATE doc SET reference2 = " + reference2 +" " +" WHERE doc_id = "+cellId + ";\n "
+					sql += "UPDATE doc SET reference2 = " + reference2 +" WHERE doc_id = "+cellId + ";\n "
 					break;
 				case 57:
 					sql += "UPDATE doc SET reference = " + editRow['ref2_'+columnId] +" " +" WHERE doc_id = "+cellId + ";\n "
@@ -169,6 +172,14 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		this.editRow['col_'+this.focus_col_id] = tr.inn
 	}
 	$scope.edit_table.ddUpdateCell = function(tr){
+		this.editRow['row_'+this.focus_col_id+'_id'] = tr['row_'+$scope.edit_table.focus.structure.doc_id+'_id']
+		if(this.editRow['col_'+$scope.edit_table.focus.structure.doc_id+'_id']
+		&& !this.editRow['col_'+$scope.edit_table.focus_col_id+'_id']
+		){
+			this.editRow['col_'+$scope.edit_table.focus_col_id+'_id'] = this.editRow['col_'+$scope.edit_table.focus.structure.doc_id+'_id']
+		}
+	}
+	$scope.edit_table.ddUpdateCell2 = function(tr){
 		console.log(tr)
 		console.log(this.editRow)
 		console.log(this.focus_col_id)
@@ -185,14 +196,19 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 			v()//closeWatch
 		})
 	}
+
+	$scope.edit_table.focus = {}
+	$scope.edit_table.focus.isExternalObject = function(){
+		return $scope.edit_table.focus.structure.reference && !$scope.edit_table.focus.structure.children
+	}
 	$scope.edit_table.onFocus27 = function(table_column){
-		$scope.edit_table.focus = {structure:table_column}
-		if($scope.edit_table.focus.structure.reference && !$scope.edit_table.focus.structure.children){//наслідуваний об'єкт
+		console.log(table_column)
+		this.focus_col_id = table_column.doc_id
+		$scope.edit_table.focus.structure=table_column
+		if($scope.edit_table.focus.isExternalObject()){//зовнішній об'єкт
 			$scope.edit_table.focus.structure = 
 				$scope.complex_types.map[$scope.edit_table.focus.structure.reference].tableRoot.docRoot
 		}
-		console.log(table_column)
-		this.focus_col_id = table_column.doc_id
 //		console.log($scope.doc_data_workdata.elementsMap[$scope.edit_table.focus_col_id])
 		var col_id = table_column.doc_id
 		console.log(col_id)
@@ -205,31 +221,37 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 			
 		if(!this.dd_list)
 			this.dd_list = {}
-		console.log(this.dd_list)
+		//console.log(this.dd_list)
 		this.dd_list[col_id] = readSql({
 			sql:dd_sql,
 		})
 		if(!$scope.edit_table.ddListener['l_'+col_id]){
 			var tableObj = $scope.doc_data_workdata.elementsMap[col_id]
 			console.log(tableObj)
+			console.log($scope.edit_table.focus.structure)
 			var seekLike = ''
 			if(57==tableObj.doctype){
 				seekLike += " LOWER(inn) LIKE LOWER(:seek)"
 			}else{
-				angular.forEach(tableObj.children, function(v){
+			console.log(seekLike)
+//			angular.forEach(tableObj.children, function(v){
+			angular.forEach($scope.edit_table.focus.structure.children, function(v){
 					console.log(v)
 					if(seekLike.length>0) seekLike += " OR "
 						seekLike += " LOWER(col_" +v.doc_id +") LIKE LOWER(:seek)"
 				})
 			}
-			var dd_seek_sql = "SELECT * FROM (" +dd_sql +") WHERE "+seekLike
+			console.log(!seekLike)
+			var dd_seek_sql = dd_sql
+			if(seekLike)
+				dd_seek_sql = "SELECT * FROM (" +dd_sql +") WHERE "+seekLike
 			console.log(dd_seek_sql)
 			$scope.edit_table.ddListener['l_'+col_id] = 
 				$scope.$watch('edit_table.editRow.seek_col_'+col_id, function(newValue){
 				if(newValue&&newValue.length>0){
 					console.log(newValue)
 					$scope.edit_table.dd_list[col_id] = readSql({
-						sql:dd_seek_sql,
+						sql:dd_seek_sql + " LIMIT 55",
 						seek:'%'+newValue+'%',
 					})
 				}else{
@@ -239,10 +261,11 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				}})
 		}
 	}
+/*
 	$scope.edit_table.keyUp = function($event){
 		console.log($event.key)
 	}
-	
+	*/
 	$scope.create_tables = {}
 	$scope.create_tables.col_keys = {}
 	$scope.create_tables.col_keys.doc_id='ІН',
@@ -258,8 +281,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
  * Тип даних - Object:27
  * Три типи об'єктів:
  * вбудований - !o.reference && o.children
- * наслідуваний - o.reference && !o.children
- * наслідуваний з розширеням - o.reference && o.children
+ * зовнішній - o.reference && !o.children
  *  
  */
 	var build_sql_table_read = $interval(function () {
