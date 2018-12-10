@@ -56,22 +56,22 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		var sql = '', i = 2
 		console.log(editRow)
 		var tableEl = $scope.doc_data_workdata.elementsMap[$scope.request.parameters.tableId]
-		//console.log(tableEl)
+		console.log(tableEl)
 		angular.forEach(tableEl.children, function(vt,k){
 //			console.log(vt)
 			var columnId = vt.doc_id,
 			columnObj = $scope.doc_data_workdata.elementsMap[columnId]
+//			console.log(columnObj)
 			v = editRow['col_'+columnId]
 			cellId = editRow['col_'+columnId+'_id']
-//			console.log(columnObj)
-//			console.log(columnId+'/'+v+'/'+cellId)
 			var reference2 = editRow['row_'+columnId+'_id']
-//			console.log(reference2)
+			console.log(columnId+'/'+v+'/'+cellId+'/'+columnObj.doctypei+'/'+reference2)
 			if(cellId){//UPDATE value
 				switch (columnObj.doctype) {
 				case 27:
-					if(reference2)
-					sql += "UPDATE doc SET reference2 = " + reference2 +" WHERE doc_id = "+cellId + ";\n "
+					if(reference2){
+						sql += "UPDATE doc SET reference2 = " + reference2 +" WHERE doc_id = "+cellId + ";\n "
+					}
 					break;
 				case 57:
 					sql += "UPDATE doc SET reference = " + editRow['ref2_'+columnId] +" " +" WHERE doc_id = "+cellId + ";\n "
@@ -88,7 +88,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				case 27:
 					if(reference2){
 						sql += sql_1c.insertCell(editRow.row_id, columnId, i)
-						sql += "UPDATE doc SET reference2 = " + v +" " +" WHERE doc_id = :nextDbId"+i + " ;\n "
+						sql += "UPDATE doc SET reference2 = " + reference2 +" " +" WHERE doc_id = :nextDbId"+i + " ;\n "
 					}
 					break;
 				case 57:
@@ -178,6 +178,8 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		){
 			this.editRow['col_'+$scope.edit_table.focus_col_id+'_id'] = this.editRow['col_'+$scope.edit_table.focus.structure.doc_id+'_id']
 		}
+		console.log(tr)
+		console.log(this.editRow)
 	}
 	$scope.edit_table.ddUpdateCell2 = function(tr){
 		console.log(tr)
