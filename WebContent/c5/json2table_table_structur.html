@@ -12,7 +12,12 @@
 				class="fa fa-{{tab2.fa}}" aria-hidden="true"></i> {{tab2.tab2}}
 			</a>
 		</div>
-		{{pageVar.config.tab2}}
+		{{pageVar.config.tab2}} <span
+			data-ng-if="'table_structur_sql'==pageVar.config.tab2"> <a
+			class="w3-tiny"
+			href="/r/url_sql_read_db1?tableId={{request.parameters.tableId}}&sql=SELECT * FROM doc d2, doc d1,docbody where d1.doc_id=docbody_id and d2.doc_id=d1.parent and d2.doctype=17 and d1.reference=:tableId">
+				DB saved SQL </a>
+		</span>
 		<div class="w3-tiny" ng-if="pageVar.config.tab2=='table_structur_sql'">
 			<a href="#" ng-click="edit_table.saveSqlReadData()"
 				class="w3-btn w3-border w3-padding-small">save</a>

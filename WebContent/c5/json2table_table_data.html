@@ -20,7 +20,9 @@
 							</div>
 						</div>
 				</div></td>
-				<th data-ng-repeat="col in table.children"><span class="am-b"
+				<th data-ng-repeat="col in table.children"
+				title="{{col.doc_id}}"
+				><span class="am-b"
 					data-ng-if="col.reference">
 						{{complex_types.map[col.reference].complex_type_name}} </span>
 					{{col.value}}</th>

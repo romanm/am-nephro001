@@ -21,6 +21,22 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 			},
 		})
 	}
+	$scope.edit_table.saveDoctype17ReadData = function(){
+		var sqlSelect = "SELECT doc_id FROM doc  WHERE doctype=20 " +
+		" AND parent=" + $scope.request.parameters.jsonId +
+		" AND reference = " + $scope.request.parameters.jsonId + ""
+		var sql = "UPDATE docbody SET docbody = :tableRoot " +
+		" WHERE docbody_id IN (" + sqlSelect + ")"
+		console.log(sql)
+//		console.log($scope.doc_data_workdata.tableRoot)
+//		console.log($scope.doc_data_workdata.tableRoot.stringify)
+		writeSql({ sql : sql,
+			tableRoot : $scope.doc_data_workdata.tableRoot.stringify,
+			dataAfterSave : function(response){
+//				console.log(response.data)
+			},
+		})
+	}
 
 	$scope.edit_table.view_57631 = function(tr){
 		return tr.col_57633+" (" +tr.col_57632 +")"
@@ -76,6 +92,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 				case 57:
 					sql += "UPDATE doc SET reference = " + editRow['ref2_'+columnId] +" " +" WHERE doc_id = "+cellId + ";\n "
 					break;
+				case 26:
+					sql += "UPDATE string SET value = '" + v +"' " +" WHERE date_id = "+cellId + ";\n "
+					break;
 				case 22:
 					sql += "UPDATE string SET value = '" + v +"' " +" WHERE string_id = "+cellId + ";\n "
 					break;
@@ -96,6 +115,10 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 					sql += "UPDATE doc SET reference2 = " + editRow['ref2_'+columnId] +" WHERE doc_id = :nextDbId"+i + " ;\n "
 //					sql += "UPDATE doc SET reference2 = :nextDbId"+i +" WHERE doc_id = :nextDbId"+i + " ;\n "
 //					sql += "INSERT INTO inn (inn, inn_id) VALUES ('"+v+"',:nextDbId"+i +" );\n"
+					break;
+				case 26:
+					sql += sql_1c.insertCell(editRow.row_id, columnId, i)
+					sql += "INSERT INTO date (value, date_id) VALUES ('"+v+"',:nextDbId" +i +" );\n"
 					break;
 				case 22:
 					sql += sql_1c.insertCell(editRow.row_id, columnId, i)
@@ -321,7 +344,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 						var columnObj = $scope.doc_data_workdata.elementsMap[columnId],
 						columnType = 
 							columnObj.doctype==22?'string':
-							(columnObj.doctype==23?'integer':''),
+							(columnObj.doctype==23?'integer':
+							(columnObj.doctype==26?'date':'')
+							),
 						row_columns = ', col_'+columnId+', col_'+columnId+'_id',
 						cell_columns = 'value col_'+columnId+', doc_id col_'+columnId+'_id'
 						v.row_columns = row_columns
@@ -379,7 +404,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		$scope.table.join_select = "SELECT "+$scope.table.row_columns+" "+$scope.table.join_select+"\n " +
 		"WHERE r.parent="+$scope.edit_table.table_data_id
 		+" AND r.reference="+$scope.request.parameters.tableId
-		//console.log($scope.table.join_select)
+		console.log($scope.table.join_select)
 		return readSql({
 			sql:$scope.table.join_select + ' LIMIT 55',
 		})
