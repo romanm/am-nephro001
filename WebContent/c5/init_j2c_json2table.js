@@ -25,6 +25,7 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		var sqlSelect = "SELECT doc_id FROM doc  WHERE doctype=20 " +
 		" AND parent=" + $scope.request.parameters.jsonId +
 		" AND reference = " + $scope.request.parameters.jsonId + ""
+		console.log(sqlSelect)
 		var sql = "UPDATE docbody SET docbody = :tableRoot " +
 		" WHERE docbody_id IN (" + sqlSelect + ")"
 		console.log(sql)
@@ -68,6 +69,8 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		if(row_id){sql = sql.replace(/:nextDbId1/,row_id)}
 		return sql
 	}
+
+	//saveRow
 	var saveRow = function(editRow, isInsertRow){
 		var sql = '', i = 2
 		console.log(editRow)
@@ -150,9 +153,11 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 							if(k.indexOf('list')==0){
 								console.log(v[0])
 								$scope.table_data.list.splice(0,0,v[0])
-			}	})	}	}	})
+							}	})	}	}	})
 		}
 	}
+
+	
 	$scope.edit_table.trashRow = function(tr){
 		console.log(tr)
 		var row_id = tr['row_'+$scope.request.parameters.tableId+'_id']
@@ -415,7 +420,9 @@ var init_j2c_json2table = function($scope, $http, $filter, $interval){
 		sql:sql_1c.read_doc_table_data_id($scope.request.parameters.jsonId),
 		afterRead:function(response){
 			if(response.data.list[0]){
+				console.log($scope.doc_data_workdata.tableRoot)
 				$scope.edit_table.table_data_id = response.data.list[0].doc_id
+				$scope.doc_data_workdata.tableRoot.tableDataElement = response.data.list[0]
 			}else{
 				console.log(response.data)
 			}
